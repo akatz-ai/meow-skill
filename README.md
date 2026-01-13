@@ -1,6 +1,6 @@
 # MEOW Skill for Claude Code
 
-A Claude Code skill for [MEOW](https://github.com/akatz-ai/meow-machine) (Meow Executors Orchestrate Work) - the Makefile of AI agent orchestration.
+A Claude Code skill for [MEOW](https://github.com/akatz-ai/meow) (Meow Executors Orchestrate Work) - the Makefile of AI agent orchestration.
 
 ## Installation
 
@@ -40,12 +40,15 @@ The MEOW skill helps you:
 This skill helps you use MEOW, so you'll need the `meow` CLI installed:
 
 ```bash
+# Quick install (Linux/macOS)
+curl -fsSL https://raw.githubusercontent.com/akatz-ai/meow/main/install.sh | sh
+
 # With Go
-go install github.com/meow-stack/meow-machine/cmd/meow@latest
+go install github.com/akatz-ai/meow/cmd/meow@latest
 
 # Or from source
-git clone https://github.com/akatz-ai/meow-machine
-cd meow-machine && make install
+git clone https://github.com/akatz-ai/meow
+cd meow && make install
 ```
 
 ## Usage
@@ -59,8 +62,8 @@ Once installed, the skill automatically activates when:
 
 ## Links
 
-- [MEOW Repository](https://github.com/akatz-ai/meow-machine)
-- [MEOW Documentation](https://github.com/akatz-ai/meow-machine/blob/main/docs/ARCHITECTURE.md)
+- [MEOW Repository](https://github.com/akatz-ai/meow)
+- [MEOW Documentation](https://github.com/akatz-ai/meow/blob/main/docs/ARCHITECTURE.md)
 
 ## License
 

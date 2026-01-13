@@ -22,12 +22,15 @@ MEOW coordinates AI agents through tmux sessions and TOML templates. Key princip
 ### Installation
 
 ```bash
-# From source
-go install github.com/meow-stack/meow-machine/cmd/meow@latest
+# Quick install (Linux/macOS)
+curl -fsSL https://raw.githubusercontent.com/akatz-ai/meow/main/install.sh | sh
+
+# With Go
+go install github.com/akatz-ai/meow/cmd/meow@latest
 
 # Or clone and build
-git clone https://github.com/meow-stack/meow-machine
-cd meow-machine && make install
+git clone https://github.com/akatz-ai/meow
+cd meow && make install
 ```
 
 ### Initialize Project
