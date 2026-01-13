@@ -1,14 +1,9 @@
-# MEOW Orchestration Skill
-
-Use this skill when working with MEOW (Meow Executors Orchestrate Work) - an AI agent orchestration tool. Applies when:
-- Working in projects containing a `.meow/` directory
-- Creating or editing `.meow.toml` workflow templates
-- Running meow CLI commands (run, status, stop, resume, ls)
-- Monitoring agents via tmux sessions
-- Setting up new MEOW projects with `meow init`
-- Debugging workflow execution issues
-
 ---
+name: meow
+description: MEOW (Meow Executors Orchestrate Work) agent orchestration tool. Use when working with projects containing a .meow/ directory, creating or editing .meow.toml workflow templates, running meow CLI commands (run, status, stop, resume, ls), monitoring agents via tmux sessions, setting up new MEOW projects with meow init, or debugging workflow execution issues.
+---
+
+# MEOW Orchestration Skill
 
 ## Overview
 
