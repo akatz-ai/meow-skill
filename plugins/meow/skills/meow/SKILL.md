@@ -1,14 +1,14 @@
 ---
 name: meow
-description: MEOW (Meow Executors Orchestrate Work) agent orchestration tool. Use when working with projects containing a .meow/ directory, creating or editing .meow.toml workflow templates, running meow CLI commands (run, status, stop, resume, ls), monitoring agents via tmux sessions, setting up new MEOW projects with meow init, or debugging workflow execution issues.
+description: MEOW (Meow Executors Orchestrate Work) agent orchestration tool. Use when working with projects containing a .meow/ directory, creating or editing .meow.toml workflow files, running meow CLI commands (run, status, stop, resume, ls), monitoring agents via tmux sessions, setting up new MEOW projects with meow init, or debugging run execution issues.
 ---
 
 # MEOW Orchestration Skill
 
 ## Overview
 
-MEOW coordinates AI agents through tmux sessions and TOML templates. Key principles:
-- **Dumb orchestrator, smart templates** - orchestrator routes events; templates define behavior
+MEOW coordinates AI agents through tmux sessions and TOML workflows. Key principles:
+- **Dumb orchestrator, smart workflows** - orchestrator routes events; workflows define behavior
 - **Local-first** - no cloud, no Python dependencies, just Go + tmux
 - **7 executors only** - shell, spawn, kill, expand, branch, foreach, agent
 
@@ -38,7 +38,7 @@ Creates:
 ```
 .meow/
 ├── config.toml      # Project configuration
-├── templates/       # Your workflow templates
+├── workflows/       # Your workflow definitions
 ├── lib/             # Standard library (linked)
 ├── adapters/        # Agent adapters
 ├── runs/            # Runtime state (gitignored)
@@ -49,25 +49,25 @@ Creates:
 
 ```bash
 # Foreground (see output)
-meow run my-template
+meow run my-workflow
 
 # Background (daemonized)
-meow run my-template -d
+meow run my-workflow -d
 
 # With variables
-meow run my-template --var task="Fix the bug" --var branch=feature-x
+meow run my-workflow --var task="Fix the bug" --var branch=feature-x
 ```
 
 ### Monitor
 
 ```bash
-# Current workflows
+# Current runs
 meow status
 
 # Watch mode (live updates)
 meow status --watch
 
-# List all workflows
+# List all runs
 meow ls
 
 # List with filters
@@ -75,32 +75,32 @@ meow ls --status running
 meow ls --stale
 ```
 
-### Stop a Workflow
+### Stop a Run
 
 ```bash
-meow stop <workflow-id>
+meow stop <run-id>
 ```
 
 ## Project Structure
 
 | Directory | Purpose |
 |-----------|---------|
-| `templates/` | Your workflow definitions (.meow.toml files) |
-| `lib/` | Standard library templates (agent-persistence, claude-utils, etc.) |
+| `workflows/` | Your workflow definitions (.meow.toml files) |
+| `lib/` | Standard library workflows (agent-persistence, claude-utils, etc.) |
 | `adapters/` | Agent-specific adapters (how to spawn different agents) |
-| `runs/` | Active workflow state (ephemeral, gitignored) |
-| `logs/` | Execution logs per workflow (gitignored) |
+| `runs/` | Active run state (ephemeral, gitignored) |
+| `logs/` | Execution logs per run (gitignored) |
 
-## Workflow Lifecycle
+## Run Lifecycle
 
 ```
-Template (.meow.toml)
+Workflow (.meow.toml)
        |
        v
    meow run
        |
        v
-  Orchestrator (reads template, manages state)
+  Orchestrator (reads workflow, manages state)
        |
        +---> spawn agent(s) in tmux
        |
@@ -111,7 +111,7 @@ Template (.meow.toml)
        +---> route events between steps
        |
        v
-  Workflow complete (all steps done)
+  Run complete (all steps done)
 ```
 
 ### Step Status Lifecycle
@@ -131,7 +131,7 @@ pending --> running --> completing --> done
 | `shell` | Orchestrator | Command exits |
 | `spawn` | Orchestrator | Agent session started |
 | `kill` | Orchestrator | Agent session terminated |
-| `expand` | Orchestrator | Template steps inserted |
+| `expand` | Orchestrator | Workflow steps inserted |
 | `branch` | Orchestrator | Condition evaluated, branch expanded |
 | `foreach` | Orchestrator | All iterations complete |
 | `agent` | Agent | Agent calls `meow done` |
@@ -140,12 +140,12 @@ pending --> running --> completing --> done
 
 ### Environment Variables
 
-When inside a MEOW workflow, agents have access to:
+When inside a MEOW run, agents have access to:
 
 | Variable | Description |
 |----------|-------------|
 | `MEOW_AGENT` | Agent name |
-| `MEOW_WORKFLOW` | Workflow ID |
+| `MEOW_WORKFLOW` | Run ID |
 | `MEOW_STEP` | Current step ID |
 | `MEOW_ORCH_SOCK` | Socket path for IPC |
 
@@ -177,7 +177,7 @@ meow step-status setup-step
 
 ### Tmux Sessions
 
-Agents run in tmux sessions named: `meow-<workflow-id>-<agent-name>`
+Agents run in tmux sessions named: `meow-<run-id>-<agent-name>`
 
 ```bash
 # List all meow sessions
@@ -192,7 +192,7 @@ tmux attach -t meow-abc123-main-agent
 ### CLI Commands
 
 ```bash
-# Active workflows with step status
+# Active runs with step status
 meow status
 
 # Live updates
@@ -205,12 +205,12 @@ meow status --json
 meow agents
 
 # Execution trace (debugging)
-meow trace <workflow-id>
+meow trace <run-id>
 ```
 
 ## Standard Library
 
-The lib/ directory contains reusable templates.
+The lib/ directory contains reusable workflows.
 
 ### Agent Persistence (Ralph Wiggum Pattern)
 
@@ -220,13 +220,13 @@ Keep agents working even when they "finish" prematurely:
 [[main.steps]]
 id = "persist"
 executor = "expand"
-template = "lib/agent-persistence#monitor"
+workflow = "lib/agent-persistence#monitor"
 needs = ["spawn-agent"]
 ```
 
 How it works:
 1. Agent's stop hook emits `meow event agent-stopped`
-2. Monitor template waits via `meow await-event`
+2. Monitor workflow waits via `meow await-event`
 3. On event, monitor nudges agent to continue
 4. Loop until main task completes
 
@@ -238,7 +238,7 @@ Configure Claude's hooks to emit MEOW events:
 [[main.steps]]
 id = "setup-hooks"
 executor = "expand"
-template = "lib/claude-events#setup-stop-hook"
+workflow = "lib/claude-events#setup-stop-hook"
 needs = ["spawn"]
 ```
 
@@ -250,7 +250,7 @@ Watch for context size warnings:
 [[main.steps]]
 id = "context-watch"
 executor = "expand"
-template = "lib/claude-utils#context-monitor"
+workflow = "lib/claude-utils#context-monitor"
 needs = ["spawn"]
 ```
 
@@ -262,15 +262,15 @@ Isolate work in a git worktree:
 [[main.steps]]
 id = "create-worktree"
 executor = "expand"
-template = "lib/worktree#create"
+workflow = "lib/worktree#create"
 [main.steps.vars]
 branch = "{{branch}}"
 ```
 
-## Basic Template Structure
+## Basic Workflow Structure
 
 ```toml
-# Template metadata
+# Workflow metadata
 [main]
 name = "my-workflow"
 description = "Does something useful"
@@ -310,9 +310,9 @@ needs = ["do-work"]
 Create `AGENTS.md` or add to `CLAUDE.md` to teach agents the MEOW protocol:
 
 ```markdown
-## MEOW Workflow Protocol
+## MEOW Run Protocol
 
-When working in a MEOW workflow:
+When working in a MEOW run:
 
 1. Check if `MEOW_ORCH_SOCK` is set (indicates MEOW context)
 2. Complete your assigned task fully
@@ -334,6 +334,6 @@ The orchestrator waits for this signal.
 ## References
 
 - [CLI Commands Reference](references/commands.md)
-- [Template Syntax Guide](references/templates.md)
+- [Workflow Syntax Guide](references/workflows.md)
 - [Common Patterns](references/patterns.md)
 - [Troubleshooting](references/troubleshooting.md)

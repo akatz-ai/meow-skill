@@ -10,22 +10,22 @@ Initialize a MEOW project in the current directory.
 meow init
 ```
 
-Creates `.meow/` directory structure with config, templates, lib, and adapters.
+Creates `.meow/` directory structure with config, workflows, lib, and adapters.
 
 ### meow run
 
-Run a workflow from a template.
+Run a workflow from a workflow.
 
 ```bash
-meow run <template> [flags]
+meow run <workflow> [flags]
 ```
 
 **Flags:**
 | Flag | Description |
 |------|-------------|
 | `-d, --daemon` | Run in background (daemonized) |
-| `--var key=value` | Set template variable (repeatable) |
-| `--workflow <id>` | Use specific workflow ID (default: generated) |
+| `--var key=value` | Set workflow variable (repeatable) |
+| `--workflow <id>` | Use specific run ID (default: generated) |
 | `--dry-run` | Parse and validate without executing |
 | `--no-resume` | Start fresh even if workflow exists |
 
@@ -37,7 +37,7 @@ meow run fix-bug
 # Run in background with variables
 meow run fix-bug -d --var issue=123 --var branch=hotfix
 
-# Dry run to validate template
+# Dry run to validate workflow
 meow run complex-workflow --dry-run
 ```
 
@@ -46,7 +46,7 @@ meow run complex-workflow --dry-run
 Show status of active workflows.
 
 ```bash
-meow status [workflow-id] [flags]
+meow status [run-id] [flags]
 ```
 
 **Flags:**
@@ -77,7 +77,7 @@ meow status --json | jq '.workflows[0].steps'
 Stop a running workflow.
 
 ```bash
-meow stop <workflow-id> [flags]
+meow stop <run-id> [flags]
 ```
 
 **Flags:**
@@ -93,7 +93,7 @@ Sends SIGTERM to agents, waits for graceful shutdown, then SIGKILL if needed.
 Resume a stopped or failed workflow.
 
 ```bash
-meow resume <workflow-id> [flags]
+meow resume <run-id> [flags]
 ```
 
 **Flags:**
@@ -152,7 +152,7 @@ Shows tmux sessions, their workflow, and status.
 Show execution trace for debugging.
 
 ```bash
-meow trace <workflow-id> [flags]
+meow trace <run-id> [flags]
 ```
 
 **Flags:**
@@ -266,7 +266,7 @@ Useful for conditional logic in shell steps.
 Approve a gate.
 
 ```bash
-meow approve <workflow-id> <gate-id>
+meow approve <run-id> <gate-id>
 ```
 
 ### meow reject
@@ -274,7 +274,7 @@ meow approve <workflow-id> <gate-id>
 Reject a gate.
 
 ```bash
-meow reject <workflow-id> <gate-id> [--reason <text>]
+meow reject <run-id> <gate-id> [--reason <text>]
 ```
 
 **Example workflow with gate:**
@@ -301,6 +301,6 @@ meow reject abc123 deploy-gate --reason "Not ready for prod"
 | `MEOW_CONFIG` | Override config file location |
 | `MEOW_DEBUG` | Enable debug logging |
 | `MEOW_ORCH_SOCK` | (Set by orchestrator) IPC socket path |
-| `MEOW_WORKFLOW` | (Set by orchestrator) Current workflow ID |
+| `MEOW_WORKFLOW` | (Set by orchestrator) Current run ID |
 | `MEOW_STEP` | (Set by orchestrator) Current step ID |
 | `MEOW_AGENT` | (Set by orchestrator) Current agent name |

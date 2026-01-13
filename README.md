@@ -20,7 +20,7 @@ A Claude Code skill for [MEOW](https://github.com/akatz-ai/meow) (Meow Executors
 
 The MEOW skill helps you:
 
-- **Create workflows** - Write TOML templates that orchestrate AI agents
+- **Create workflows** - Write TOML workflows that orchestrate AI agents
 - **Run workflows** - `meow run`, `meow status`, `meow stop`
 - **Monitor agents** - Check status, attach to tmux sessions, view logs
 - **Debug issues** - Troubleshoot stale workflows, agent hangs, lock conflicts
@@ -31,7 +31,7 @@ The MEOW skill helps you:
 |------|---------|
 | `SKILL.md` | Core documentation - quick start, executors, monitoring |
 | `references/commands.md` | Complete CLI reference |
-| `references/templates.md` | Template syntax guide (7 executors) |
+| `references/workflows.md` | Workflow syntax guide (7 executors) |
 | `references/patterns.md` | Common workflow patterns |
 | `references/troubleshooting.md` | Debugging guide |
 
@@ -56,7 +56,7 @@ cd meow && make install
 Once installed, the skill automatically activates when:
 
 - You're working in a project with a `.meow/` directory
-- You ask about MEOW workflows, templates, or orchestration
+- You ask about MEOW workflows, runs, or orchestration
 - You use `meow` CLI commands
 - You need to debug agent workflows
 

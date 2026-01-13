@@ -12,7 +12,7 @@ meow ls --stale
 **Fix:**
 ```bash
 # Stop specific workflow
-meow stop <workflow-id>
+meow stop <run-id>
 
 # Or clean up all stale
 meow ls --stale --json | jq -r '.[].id' | xargs -I{} meow stop {}
@@ -32,15 +32,15 @@ meow ls --stale --json | jq -r '.[].id' | xargs -I{} meow stop {}
 meow ls
 
 # Stop the existing one
-meow stop <workflow-id>
+meow stop <run-id>
 
 # Then start new
-meow run my-template
+meow run my-workflow
 ```
 
-**Alternative:** Force new workflow ID:
+**Alternative:** Force new run ID:
 ```bash
-meow run my-template --workflow new-unique-id
+meow run my-workflow --workflow new-unique-id
 ```
 
 ## Agent Not Responding
@@ -68,7 +68,7 @@ tmux attach -t meow-<workflow>-<agent>
 3. **Prompt not displayed:** Agent might not have received the prompt
    ```bash
    # Check workflow trace
-   meow trace <workflow-id>
+   meow trace <run-id>
    ```
 
 **Fix:** If agent is truly stuck:
@@ -77,7 +77,7 @@ tmux attach -t meow-<workflow>-<agent>
 tmux kill-session -t meow-<workflow>-<agent>
 
 # Then either resume or restart
-meow resume <workflow-id>
+meow resume <run-id>
 ```
 
 ## meow done Not Working
@@ -108,8 +108,8 @@ ls -la $MEOW_ORCH_SOCK
 **Fix:**
 ```bash
 # Restart the workflow
-meow stop <workflow-id>
-meow run <template>
+meow stop <run-id>
+meow run <workflow>
 ```
 
 ## Workflow Failed
@@ -119,13 +119,13 @@ meow run <template>
 **Diagnose:**
 ```bash
 # Check status for which step failed
-meow status <workflow-id>
+meow status <run-id>
 
 # Check execution trace
-meow trace <workflow-id>
+meow trace <run-id>
 
 # Check logs
-cat .meow/logs/<workflow-id>.log
+cat .meow/logs/<run-id>.log
 ```
 
 **Common causes:**
@@ -135,29 +135,29 @@ cat .meow/logs/<workflow-id>.log
    - Test command manually
 
 2. **Agent timeout:** Step took too long
-   - Increase timeout in template
+   - Increase timeout in workflow
    - Check if agent got stuck
 
-3. **Template error:** Invalid variable reference, missing dependency
-   - Dry run to validate: `meow run <template> --dry-run`
+3. **Workflow error:** Invalid variable reference, missing dependency
+   - Dry run to validate: `meow run <workflow> --dry-run`
 
 **Fix:**
 ```bash
 # Reset failed steps and resume
-meow resume <workflow-id> --reset-failed
+meow resume <run-id> --reset-failed
 
 # Or start fresh
-meow stop <workflow-id>
-meow run <template>
+meow stop <run-id>
+meow run <workflow>
 ```
 
-## Template Parsing Errors
+## Workflow Parsing Errors
 
-**Symptom:** `template parse error` on `meow run`.
+**Symptom:** `workflow parse error` on `meow run`.
 
 **Diagnose:**
 ```bash
-meow run <template> --dry-run
+meow run <workflow> --dry-run
 ```
 
 **Common issues:**
@@ -203,15 +203,15 @@ tmux kill-session -t meow-old-<workflow>-<agent>
 **Missing session** (workflow expects it):
 ```bash
 # Workflow state is inconsistent, restart
-meow stop <workflow-id>
-meow run <template>
+meow stop <run-id>
+meow run <workflow>
 ```
 
 ## Lock File Issues
 
 **Symptom:** `lock file exists` or similar errors.
 
-**Location:** `.meow/runs/<workflow-id>/lock`
+**Location:** `.meow/runs/<run-id>/lock`
 
 **Fix:**
 ```bash
@@ -219,10 +219,10 @@ meow run <template>
 meow status
 
 # If not, remove stale lock
-rm .meow/runs/<workflow-id>/lock
+rm .meow/runs/<run-id>/lock
 
 # Or stop the workflow properly
-meow stop <workflow-id>
+meow stop <run-id>
 ```
 
 ## Event Timeout
@@ -232,7 +232,7 @@ meow stop <workflow-id>
 **Diagnose:**
 ```bash
 # Check if event was emitted
-meow trace <workflow-id> | grep event
+meow trace <run-id> | grep event
 ```
 
 **Common causes:**
@@ -251,7 +251,7 @@ MEOW_ORCH_SOCK=<socket> meow event <type>
 
 For detailed debugging:
 ```bash
-MEOW_DEBUG=1 meow run <template>
+MEOW_DEBUG=1 meow run <workflow>
 ```
 
 This logs:

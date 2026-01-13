@@ -1,6 +1,6 @@
-# MEOW Template Syntax Guide
+# MEOW Workflow Syntax Guide
 
-Templates are TOML files defining workflows. They live in `.meow/templates/`.
+Workflows are TOML files defining agent orchestration. They live in `.meow/workflows/`.
 
 ## Basic Structure
 
@@ -10,7 +10,7 @@ Templates are TOML files defining workflows. They live in `.meow/templates/`.
 name = "my-workflow"
 description = "What this workflow does"
 
-# Template variables
+# Workflow variables
 [main.vars]
 required_var = { required = true }
 optional_var = { default = "value" }
@@ -34,7 +34,7 @@ prompt = "Do something"
 
 ```toml
 [main.vars]
-# Required - workflow fails if not provided
+# Required - run fails if not provided
 task = { required = true }
 
 # Optional with default
@@ -62,7 +62,7 @@ Branch: {{branch}}
 ### Providing Values
 
 ```bash
-meow run my-template --var task="Fix bug #123" --var branch=hotfix
+meow run my-workflow --var task="Fix bug #123" --var branch=hotfix
 ```
 
 ## The 7 Executors
@@ -94,7 +94,7 @@ adapter = "claude"       # which adapter to use
 working_dir = "{{dir}}"  # optional
 ```
 
-Creates tmux session: `meow-<workflow-id>-<agent-name>`
+Creates tmux session: `meow-<run-id>-<agent-name>`
 
 ### kill
 
@@ -110,22 +110,22 @@ needs = ["work-complete"]
 
 ### expand
 
-Inline another template's steps.
+Inline another workflow's steps.
 
 ```toml
 [[main.steps]]
 id = "setup"
 executor = "expand"
-template = "lib/agent-persistence#monitor"
+workflow = "lib/agent-persistence#monitor"
 [main.steps.vars]
 agent = "main"
 ```
 
-Template references:
+Workflow references:
 - `.local` - another workflow in same file
 - `lib/name` - from .meow/lib/
-- `lib/name#workflow` - specific workflow in template
-- `path/to/file` - relative to templates/
+- `lib/name#workflow` - specific workflow in file
+- `path/to/file` - relative to workflows/
 - `path/to/file#workflow` - specific workflow
 
 Expanded steps get prefixed: `setup.original-step-id`
@@ -167,7 +167,7 @@ id = "process-files"
 executor = "foreach"
 items = ["a.go", "b.go", "c.go"]
 item_var = "file"
-body = "process-single"  # template to expand per item
+body = "process-single"  # workflow to expand per item
 
 # Or from previous step output
 items_from = "list-files.outputs.files"
@@ -272,7 +272,7 @@ on_error = "continue"  # or "fail" (default)
 
 ## Cleanup Scripts
 
-Run commands after workflow completes:
+Run commands after run completes:
 
 ```toml
 [main]
@@ -296,7 +296,7 @@ branch = { default = "feature" }
 [[main.steps]]
 id = "create-worktree"
 executor = "expand"
-template = "lib/worktree#create"
+workflow = "lib/worktree#create"
 [main.steps.vars]
 branch = "{{branch}}"
 
@@ -310,13 +310,13 @@ needs = ["create-worktree"]
 [[main.steps]]
 id = "setup-hooks"
 executor = "expand"
-template = "lib/claude-events#setup-stop-hook"
+workflow = "lib/claude-events#setup-stop-hook"
 needs = ["spawn"]
 
 [[main.steps]]
 id = "persist"
 executor = "expand"
-template = "lib/agent-persistence#monitor"
+workflow = "lib/agent-persistence#monitor"
 needs = ["spawn"]
 [main.steps.vars]
 main_step = "implement"
@@ -345,7 +345,7 @@ needs = ["implement"]
 
 ## Step ID Rules
 
-1. Must be unique within template
+1. Must be unique within workflow
 2. **Cannot contain dots** - dots are reserved for expansion prefixes
 3. Use kebab-case: `my-step-id`
 4. Expanded steps get prefixed: `parent.child`

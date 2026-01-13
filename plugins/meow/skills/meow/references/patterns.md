@@ -55,13 +55,13 @@ adapter = "claude"
 [[main.steps]]
 id = "setup-hooks"
 executor = "expand"
-template = "lib/claude-events#setup-stop-hook"
+workflow = "lib/claude-events#setup-stop-hook"
 needs = ["spawn"]
 
 [[main.steps]]
 id = "monitor"
 executor = "expand"
-template = "lib/agent-persistence#monitor"
+workflow = "lib/agent-persistence#monitor"
 needs = ["spawn"]
 [main.steps.vars]
 main_step = "work"
@@ -103,7 +103,7 @@ task = { required = true }
 [[main.steps]]
 id = "worktree"
 executor = "expand"
-template = "lib/worktree#create"
+workflow = "lib/worktree#create"
 [main.steps.vars]
 branch = "{{branch}}"
 
@@ -146,7 +146,7 @@ Watch for agent context size warnings and handle gracefully.
 [[main.steps]]
 id = "context-monitor"
 executor = "expand"
-template = "lib/claude-utils#context-monitor"
+workflow = "lib/claude-utils#context-monitor"
 needs = ["spawn"]
 [main.steps.vars]
 agent = "worker"
@@ -245,13 +245,13 @@ command = "rm -rf pending-changes/"
 Then from outside the workflow:
 ```bash
 # Check what needs approval
-meow status <workflow-id>
+meow status <run-id>
 
 # Approve
-meow approve <workflow-id> review
+meow approve <run-id> review
 
 # Or reject
-meow reject <workflow-id> review --reason "Changes look wrong"
+meow reject <run-id> review --reason "Changes look wrong"
 ```
 
 ## Output Chaining
